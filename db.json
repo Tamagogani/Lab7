@@ -1,18 +1,37 @@
 {
   "posts": [
     {
-      "id": 1,
-      "title": "json-server",
-      "author": "typicode"
-    }
-  ],
-  "comments": [
+      "author": "Joe Mama",
+      "title": "Papa Johns",
+      "id": 2
+    },
     {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
+      "author": "Kirkland SIgnature",
+      "title": "Tissues",
+      "id": 3
+    },
+    {
+      "author": "Steve Apple",
+      "title": "The Mac Phone",
+      "id": 4
+    },
+    {
+      "author": "uncle Samsing",
+      "title": "SamDroid",
+      "id": 5
+    },
+    {
+      "author": "The Wise man",
+      "title": "How to properly worship Shibe Inu",
+      "id": 6
+    },
+    {
+      "author": "The not dumb man",
+      "title": "How to not die",
+      "id": 7
     }
   ],
+  "comments": [],
   "profile": {
     "name": "typicode"
   }

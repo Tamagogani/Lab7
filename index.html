@@ -79,45 +79,229 @@
 
     <!-- Main Script -->
     <script type="module">
+    // define constant objects
+    const OUTPUT = document.getElementById("output");
+    const ENDPOINT = document.getElementById("endpoint");
+    const RECORD_FORM = document.getElementById("recordForm");
+    const AUTHOR = document.getElementById("author");
+    const TITLE = document.getElementById("title");
+    const RECORD_ID = document.getElementById("recordID");
+    const ID_CONTAINER = document.getElementById("recordIDcontainer");
+
       // This function should fetch all of the data from the given endpoint.
       // From the 4 CRUD actions, this is the READ action, and uses the GET http method.
       // The main difference from fetchOne() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
-      function fetchAll() {
-        // TODO
+      async function fetchAll() {
+        // hide forms
+        RECORD_FORM.style.display = "none";
+        ID_CONTAINER.style.display = "none";
+
+        // clear all data values
+        OUTPUT.innerHTML = "";
+        AUTHOR.value = "";
+        TITLE.value = "";
+        RECORD_ID.value = "";
+
+        try {
+          // try fetching from url
+          let response = await fetch(ENDPOINT.value);
+          let json  = await response.json();
+
+          // check response
+          if(response.ok == false)
+          {
+            throw Error(response.statusText);
+          }
+
+          // parse JSON object and set output string
+          OUTPUT.innerHTML = JSON.stringify(json);
+        }
+        catch(e) {
+          OUTPUT.innerHTML = e;
+          console.log("fetch error");
+        }
       }
 
       // This function should fetch one entry from the given endpoint.
       // From the 4 CRUD actions, this is the READ action, and uses the GET http method.
       // The main difference from fetchAll() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
-      function fetchOne() {
-        // TODO
+      async function fetchOne() {
+        try{
+          const ID = window.prompt("Record ID: ");
+          // get the data
+          await fetchAll();
+          // parse the data
+          const data_frame = JSON.parse(OUTPUT.innerHTML);
+          OUTPUT.innerHTML = "";
+
+          // loop through JSON keys and check id parameter
+          for(var key in Object.keys(data_frame)) {
+            if(data_frame[key].id == ID){
+              OUTPUT.innerHTML = JSON.stringify(data_frame[key]);
+              // short circuit if ID is found
+              return;
+            }
+          }
+          // throw error if ID is not found
+          throw Error(`ID: ${ID} was not found`);
+        }
+        catch(e) {
+          OUTPUT.innerHTML = e;
+          console.log("fetch one error");.
+        }
       }
 
       // This function should use fetch to create one entry in the given endpoint.
       // From the 4 CRUD actions, this is the CREATE action, and uses the POST http method.
       // The main difference from updateRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
-      function createRecord() {
-        // TODO
+      async function createRecord(show) {
+        switch (show) {
+          // do nothing if "show"
+          case "show":
+            // set display style
+            RECORD_FORM.style.display = "block";
+            ID_CONTAINER.style.display = "none";
+            //clear outputs
+            OUTPUT.innerHTML = "";
+            AUTHOR.value = "";
+            TITLE.value = "";
+            RECORD_ID.value = "";
+            break;
+
+          // construct and post new item if submit
+          case "submit":
+            try{
+
+              // construct item
+              const ITEM = {
+                author: AUTHOR.value,
+                title: TITLE.value,
+              };
+
+              // post item (automatically add ID)
+              let response = await fetch(ENDPOINT.value, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(ITEM),
+              });
+
+              // check response
+              if (response.ok == false) {
+                throw Error("Could not fetch from URL");
+              }
+
+              // output result
+              OUTPUT.innerHTML = JSON.stringify(await response.json());
+            }
+            catch(e) {
+              OUTPUT.innerHTML = e;
+              console.log("Create Error");
+            }
+        }
       }
 
       // This function should use fetch to update one existing entry in the given endpoint.
       // From the 4 CRUD actions, this is the UPDATE action, and uses the PUT http method.
       // The main difference from createRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
-      function updateRecord() {
-        // TODO
+      async function updateRecord(show) {
+        switch (show) {
+          // do nothing if "show"
+          case "show":
+            // set display style
+            RECORD_FORM.style.display = "block";
+            ID_CONTAINER.style.display = "block";
+            //clear outputs
+            OUTPUT.innerHTML = "";
+            AUTHOR.value = "";
+            TITLE.value = "";
+            RECORD_ID.value = "";
+            break;
+
+          // construct and post new item if submit
+          case "submit":
+            try{
+
+              // construct item
+              const ITEM = {
+                author: AUTHOR.value,
+                title: TITLE.value,
+              };
+
+              // post item (automatically add ID)
+              let response = await fetch(ENDPOINT.value + "/" + RECORD_ID.value, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(ITEM),
+              });
+
+              // check response
+              if (response.ok == false) {
+                throw Error("Could not fetch from URL");
+              }
+
+              // output result
+              OUTPUT.innerHTML = JSON.stringify(await response.json());
+            }
+            catch(e) {
+              OUTPUT.innerHTML = e;
+              console.log("Update Error");
+            }
+        }
       }
 
       // This function should use fetch to delete one existing entry in the given endpoint.
       // From the 4 CRUD actions, this is the DELETE action, and uses the DELETE http method.
       // The main difference from fetchOne() will be the HTTP method you use to make your
-      // request; check the writeup to view the URL pattern for get one and delete. THERE IS NO 
+      // request; check the writeup to view the URL pattern for get one and delete. THERE IS NO
       // delete all, only delete one.
-      function deleteRecord() {
-        // TODO
+      async function deleteRecord() {
+        // set display style
+        RECORD_FORM.style.display = "none";
+        ID_CONTAINER.style.display = "none";
+        //clear outputs
+        OUTPUT.innerHTML = "";
+        AUTHOR.value = "";
+        TITLE.value = "";
+        RECORD_ID.value = "";
+
+        try{
+
+          // construct item
+          const ITEM = {
+            author: AUTHOR.value,
+            title: TITLE.value,
+          };
+
+          RECORD_ID.value = window.prompt("ID: ");
+
+          // post item (automatically add ID)
+          let response = await fetch(ENDPOINT.value + "/" + RECORD_ID.value, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          // check response
+          if (response.ok == false) {
+            throw Error("Could not fetch from URL");
+          }
+
+          // output result
+          OUTPUT.innerHTML = JSON.stringify(await response.json());
+        }
+        catch(e) {
+          OUTPUT.innerHTML = e;
+          console.log("Delete Error");
+        }
       }
 
       window.addEventListener('DOMContentLoaded', () => {
@@ -155,7 +339,7 @@
           .addEventListener("submit", event => {
             event.preventDefault();
             let command = document.getElementById('action').value;
-            
+
             switch (command) {
               case "Create":
                 createRecord('submit');
@@ -168,6 +352,8 @@
             }
           });
       });
+      // fetch parameters found here:
+      // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
     </script>
   </body>
 </html>
